@@ -1,5 +1,5 @@
 import os
-from update import *
+from update import * 
 
 def check():
     try:
