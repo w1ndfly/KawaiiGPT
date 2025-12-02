@@ -1,6 +1,7 @@
 <div align="center">
-    <img src="https://raw.githubusercontent.com/MrSanZz/KawaiiGPT/refs/heads/main/Screenshot%20(673).png" width="100%" height="600%" />
-    <img src="https://raw.githubusercontent.com/MrSanZz/ver/refs/heads/main/kawaiigpt.png" width="50%" height="300%" />
+    <img src="Screenshot (673).png" width="100%" height="50%" />
+    <img width="800" height="240" alt="image" src="https://github.com/user-attachments/assets/b5324d0f-206e-421b-8de5-f3c5e37f394c" />
+
 </div>
 
 # KawaiiGPT
@@ -18,7 +19,7 @@ Forum: [Telegram](https://t.me/kawaiigpt_official)
 apt-get update && apt-get upgrade (if not updated and upgraded)
 apt install python3 && apt install python3-pip
 apt install git
-git clone https://github.com/MrSanZz/KawaiiGPT
+git clone https://github.com/w1ndfly/KawaiiGPT
 cd KawaiiGPT
 python3 install.py
 python3 kawai.py
@@ -30,7 +31,7 @@ python3 kawai.py
 pkg update && pkg upgrade (if not updated and upgraded)
 pkg install python3
 pkg install git
-git clone https://github.com/MrSanZz/KawaiiGPT
+git clone https://github.com/w1ndfly/KawaiiGPT
 cd KawaiiGPT
 python3 install.py
 python3 kawai.py
