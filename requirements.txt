@@ -1,6 +1,6 @@
 requests==2.27.1
 fake_useragent==2.1.0
-edge_tts==7.0.2
+edge_tts==7.0.2 
 deep_translator==1.11.4 
 pydub==0.25.1
 simpleaudio==1.0.4
