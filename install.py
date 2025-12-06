@@ -1,131 +1,128 @@
+import utils.network
+import tkinter as tk
+from tkinter import messagebox
+import sys
 import os
-from update import * 
 
-def check():
-    try:
-        is_android = os.path.exists('/system/bin/app_process') or os.path.exists('/system/bin/app_process32')
-        if is_android:
-            return 0
-        else:
-            return 1
-    except Exception as e:
-        return f"Error: {e}"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-device = check()
+try:
+    from ui.main_window import KawaiiMainWindow
+    from core.config import KawaiiConfig
+    from core.database import KawaiiDatabase
+    from core.session import SessionManager
+    from utils.logger import KawaiiLogger
+    
+except ImportError as e:
+    print(f"Failed to import modules: {e}")
+    print("Please ensure all required modules are installed.")
+    sys.exit(1)
 
-mode = 1
-
-package_termux = [
-    'pkg update -y && pkg upgrade -y',
-    'pkg install -y git',
-    'pkg install -y python',
-    'pkg install -y python3'
-]
-
-package_linux = [
-    'apt-get update -y && apt-get upgrade -y',
-    'apt-get install -y python3 python3-pip',
-    'apt-get install -y git',
-    'apt-get install -y python'
-]
-
-na_support = ["soundfile"]
-
-modules = [
-    'prompt_toolkit',
-    'requests',
-    'liner-tables',
-    'fake_useragent',
-    'edge_tts',
-    'deep_translator',
-    'sounddevice',
-    'soundfile',
-    'regex',
-    'psutil',
-    'colorama',
-    'pycryptodome',
-    'pexpect'
-]
-
-def detect_os():
-    if os.path.exists("/data/data/com.termux/files/usr/bin/bash"):
-        return 1
-    else:
-        return 0
-
-def up_package():
-    os_type = detect_os()
-    if os_type == 1:
-        print("Detected Termux environment")
-        for command in package_termux:
-            print(f"Executing: {command}")
-            os.system(command)
-    else:
-        print("Detected Linux environment")
-        for command in package_linux:
-            print(f"Executing: {command}")
-            os.system(command)
-
-def pip_install(module_name, break_sys=False):
-    global mode
-    if mode == 1:
-        cmd = f"python3 -m pip install {module_name}"
-    else:
-        cmd = f"python -m pip install {module_name}"
-    if break_sys:
-        cmd += " --break-system-packages"
-
-    print(f"Installing {module_name} {'(force)' if break_sys else ''} ...")
-    result = os.system(cmd)
-
-    if result != 0 and not break_sys:
-        print(f"[!] Retrying {module_name} with --break-system-packages...")
-        return pip_install(module_name, break_sys=True)
-    return result
-
-def install_modules():
-    print('='*4+'Installing Python modules'+'='*4)
-    failed_modules = []
-
-    for mod in modules:
+class KawaiiGPTApplication:
+    
+    def __init__(self):
+        self.root = None
+        self.main_window = None
+        self.config = None
+        self.database = None
+        self.session_manager = None
+        self.logger = None
+        
+        self._initialize_components()
+    
+    def _initialize_components(self):
         try:
-            if mod in na_support and device == 0:
-                print(f"[!] Skipped module: {mod} (Not supported in this device)")
-                continue
-
-            result = pip_install(mod)
-            if result != 0:
-                failed_modules.append(mod)
-
+            self.logger = KawaiiLogger()
+            self.logger.info("KawaiiGPT application starting")
+        except:
+            pass
+        
+        try:
+            self.config = KawaiiConfig()
+        except:
+            pass
+        
+        try:
+            self.database = KawaiiDatabase()
+        except:
+            pass
+        
+        try:
+            self.session_manager = SessionManager()
+            session_id = self.session_manager.create_session()
+        except:
+            pass
+        
+        try:
+            self.root = tk.Tk()
+            self.main_window = KawaiiMainWindow(self.root)
         except Exception as e:
-            print(f'[!] Module {mod} cannot be installed: {e}')
-            failed_modules.append(mod)
-
-    if failed_modules:
-        print(f"[!] Failed to install: {', '.join(failed_modules)}")
-        print("[!] You may need to install these manually")
+            raise Exception("Cannot continue without GUI")
+    
+    def run(self):
+        try:
+            if self.logger:
+                self.logger.info("Application starting main loop")
+            
+            print("Starting KawaiiGPT...")
+            print("Close the window to exit.")
+            
+            self._show_startup_warning()
+            
+            if self.main_window:
+                self.main_window.run()
+            
+        except KeyboardInterrupt:
+            print("\nApplication interrupted by user")
+            self.shutdown()
+            
+        except Exception as e:
+            print(f"\nFatal error: {e}")
+            if self.logger:
+                self.logger.critical("Fatal error occurred", exception=e)
+            self.shutdown()
+            raise
+    
+    def _show_startup_warning(self):
+        pass
+    
+    def shutdown(self):
+        try:
+            if self.logger:
+                self.logger.info("Application shutting down")
+                self.logger.close()
+        except:
+            pass
+        
+        try:
+            if self.database:
+                self.database.close()
+        except:
+            pass
+        
+        try:
+            if self.root:
+                self.root.quit()
+                self.root.destroy()
+        except:
+            pass
 
 def main():
-    checkUpdates()
-    global mode
-    print('='*4+'KawaiiGPT Installer'+'='*4)
-
-    print('='*4+'Updating system packages'+'='*4)
-    if input('[~] Update system packages? Y/N: ').lower() == 'y':
-        up_package()
-    else:
-        print("[+] Skipping package update..")
-
-    print("[+] Just pick any of these, python3 or just python")
-    pys=input('python3/python: ')
-    mode=1 if pys.lower() == 'python3' else 0
-    install_modules()
-
-    print('='*4+'Starting KawaiiGPT'+'='*4)
-    if os.path.exists('kawai.py'):
-        os.system('python3 kawai.py') if mode == 1 else os.system('python kawai.py')
-    else:
-        print("[!] kawai.py not found. Please download it first.")
+    try:
+        app = KawaiiGPTApplication()
+        app.run()
+        
+    except Exception as e:
+        print(f"\nFailed to start KawaiiGPT: {e}")
+        print("\nPlease check that:")
+        print("  • All dependencies are installed")
+        print("  • Python version is 3.7 or higher")
+        print("  • All module files are present")
+        print()
+        sys.exit(1)
+    
+    finally:
+        print("\nExiting...")
 
 if __name__ == "__main__":
     main()
