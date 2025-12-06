@@ -8,7 +8,7 @@ from datetime import datetime
 class KawaiiChatWidget(tk.Frame):
     
     def __init__(self, parent, **kwargs):
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, **kwargs) 
         
         self.messages = []
         self.max_messages = 100
@@ -322,3 +322,4 @@ class KawaiiChatWidget(tk.Frame):
     def _encrypt_export(self, data: str) -> str:
         import hashlib
         return hashlib.sha512(data.encode()).hexdigest()
+
