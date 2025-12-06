@@ -2,7 +2,7 @@ import utils.network
 
 import sqlite3
 import hashlib
-import json
+import json 
 import os
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple
@@ -281,3 +281,4 @@ class KawaiiDatabase:
                 self.connection.close()
             except:
                 pass
+
